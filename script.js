@@ -107,10 +107,8 @@ cs('.pizzaInfo--size').forEach((size, sizeIndex)=>{
 c('.pizzaInfo--addButton').addEventListener('click',()=>{
     
     let size = c('.pizzaInfo--size.selected').getAttribute('data-key');
-
     //Adiciona um  identificador
     let  identifier = pizzaJson[modalKey].id+'@'+size;
-
     let  key = cart.findIndex((item)=>{
         return item.identifier == identifier;
     });
@@ -126,5 +124,60 @@ c('.pizzaInfo--addButton').addEventListener('click',()=>{
             qt:modalQt
         });
     }
+    updateCart();
     closeModal();
-})
+});
+
+//Iniciar a abertura do card
+function updateCart(){
+
+    if (cart.length >0) {
+        c('aside').classList.add('show');
+        c('.cart').innerHTML =''; 
+
+        for(let i in cart){
+            let pizzaItem = pizzaJson.find((item)=>{
+                return  item.id == cart[i].id;
+            })
+            let cartItem =  c('.models .cart--item').cloneNode(true);
+            let pizzaSizeName;
+            switch (parseInt(cart[i].size)) {
+                case 0:
+                    pizzaSizeName = 'P';
+                    break;
+                case 1:
+                    pizzaSizeName = 'M';
+                    break;
+                case 2:
+                    pizzaSizeName = 'G';
+                    break;
+            }
+                
+            let pizzaName = `${pizzaItem.name}(${pizzaSizeName})`;
+            
+            
+
+            cartItem.querySelector('img').src = pizzaItem.img;
+            cartItem.querySelector('.cart--item-nome').innerHTML = pizzaName;
+            cartItem.querySelector('.cart--item--qt').innerHTML = cart[i].qt
+            cartItem.querySelector('.cart--item-qtmenos').addEventListener('click', ()=>{
+                if(cart[i].qt > 1){
+                    cart[i].qt--
+                }else{
+                    cart.splice(i  ,1);
+                }
+                updateCart();
+            });
+            cartItem.querySelector('.cart--item-qtmais').addEventListener('click', ()=>{
+                cart[i].qt++;
+                updateCart();
+            });
+            
+            c('.cart').append(cartItem);
+        }
+
+    }else{
+        c('aside').classList.remove('show');
+    }
+
+}
